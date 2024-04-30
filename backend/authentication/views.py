@@ -2,10 +2,13 @@ from rest_framework.response import Response
 from rest_framework import generics
 
 from rest_framework_simplejwt.views import TokenObtainPairView
-from .serializers import MyTokenObtainPairSerializer, RegisterSerializer, UserSerializer
+from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth import authenticate, get_user_model
 
-class RegisterView(generics.CreateAPIView):
+User = get_user_model()
+
+class RegisterView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
     
     def post(self, request):
@@ -17,5 +20,21 @@ class RegisterView(generics.CreateAPIView):
         
         return Response({ "msg": { "user": serializer.data, "access_token": str(refresh.access_token), 'refresh_token': str(refresh) } })
 
-class MyTokenObtainPairView(TokenObtainPairView):
-    serializer_class = MyTokenObtainPairSerializer
+class MyTokenObtainPairView(generics.GenericAPIView):
+    serializer_class = LoginSerializer
+    
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.data
+        
+        user = authenticate(username=data.get("username"), password=data.get("password"))
+        if not user:
+            return Response({ "details": "Invalid Credentails" }, status=400)
+        
+        user_data = UserSerializer(data=user.__dict__)
+        user_data.is_valid()
+        
+        refresh = RefreshToken.for_user(user)
+        
+        return Response({ "msg": { "user": user_data.data, "access_token": str(refresh.access_token), 'refresh_token': str(refresh) } })
