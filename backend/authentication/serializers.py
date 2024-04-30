@@ -1,29 +1,13 @@
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
-
-# class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-#     @classmethod
-#     def get_token(cls, user):
-#         token = super().get_token(user)
-
-#         # Add custom claims
-#         token['id'] = user.id
-#         token['username'] = user.username
-
-#         return token
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'email', 'first_name', 'last_name', 'password', 'profile_pic', 'bio', 'website')
 
-class LoginSerializer(serializers.Serializer):
-    username = serializers.CharField()
-    password = serializers.CharField()
-    
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -45,3 +29,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         if response.get("password", None):
             response.pop("password", None)
         return response
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField()
+
+class WhoAmISerializer(serializers.Serializer):
+    token = serializers.CharField()
