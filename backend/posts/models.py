@@ -8,7 +8,7 @@ class Post(models.Model):
     content = models.CharField(max_length=280, blank=True, null=True)
     image = models.ImageField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    likes = models.ManyToManyField(User, related_name="posts", blank=True, null=True)
+    likes = models.ManyToManyField(User, related_name="posts", blank=True)
 
     def __str__(self):
         return f"{self.content} | {self.author}"
