@@ -7,20 +7,19 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
+        fields = ('username', 'email', 'first_name', 'last_name', 'profile_pic', 'bio', 'website')
 
 class PostSerializer(serializers.ModelSerializer):
-    author = serializers.RelatedField(source="user", read_only=True)
-    author_handler = serializers.CharField(read_only=True, default=User.username)
-    display_name = serializers.CharField(read_only=True, default=f"{User.first_name} {User.last_name}")
-    created_at = serializers.DateTimeField(read_only=True)
-    likes = UserSerializer(read_only=True, many=True)
-
     class Meta:
         model = Post
-        fields = "__all__"
-    
+        exclude = ('owner', 'created_at', 'likes')
+
     def to_representation(self, instance):
         response = super().to_representation(instance)
+        
+        owner = UserSerializer(data=instance.owner.__dict__)
+        owner.is_valid()
+        response["owner"] = owner.data
         
         new_response = { "msg": { "post": response } }
         return new_response

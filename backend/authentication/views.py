@@ -1,9 +1,9 @@
 from rest_framework.response import Response
-from rest_framework import generics
-from rest_framework import permissions
-from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, WhoAmISerializer
+from rest_framework.views import APIView
+from rest_framework import generics, permissions
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate, get_user_model
+from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, WhoAmISerializer
 
 User = get_user_model()
 
