@@ -20,10 +20,21 @@ class RetrieveUpdateDestroyPostView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsOwner]
 
 class LikePostView(APIView):
-    def post(self, request, pk):
-        post = Post.objects.filter(pk=pk)
-        print(post.likes.filter(pk=request.user.id))
-        post.likes.add(request.user)
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def put(self, request, pk):
+        user = request.user
+        msg = ""
+
+        post = Post.objects.get(id=pk)
+
+        if len(post.likes.filter(id=user.id)) < 1:
+            post.likes.add(user)
+            msg = f"Post (with the id of {post.pk}) has been liked"
+        else:
+            post.likes.remove(user)
+            msg = f"Removed like from Post (with the id of {post.pk})"
+
         post.save()
         
-        return Response({ "msg": f"Post (with the id of {post.pk}) has been liked" })
+        return Response({ "msg": msg })
