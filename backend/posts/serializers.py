@@ -12,22 +12,29 @@ class UserSerializer(serializers.ModelSerializer):
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        exclude = ('owner', 'created_at', 'likes')
+        exclude = ['owner']
+        extra_kwargs = {
+            'likes': { 'read_only': True },
+            'created_at': { 'read_only': True }
+        }
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
-        
+
         owner = UserSerializer(data=instance.owner.__dict__)
         owner.is_valid()
-        response["owner"] = owner.data
+        response["owner"] = owner.data        
         
-        new_response = { "msg": { "post": response } }
-        return new_response
+        return response
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        exclude = ('post', 'owner', 'created_at', 'likes')
+        exclude = ('post', 'owner')
+        extra_kwargs = {
+            'likes': { 'read_only': True },
+            'created_at': { 'read_only': True }
+        }
 
     def to_representation(self, instance):
         response = super().to_representation(instance)
