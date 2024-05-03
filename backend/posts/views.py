@@ -1,11 +1,12 @@
+from .serializers import PostSerializer, CommentSerializer
 from rest_framework import generics, permissions
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from .models import Post, Comment
 from .permissions import IsOwner
-from .serializers import PostSerializer
-from .models import Post
 
-class ListCreateView(generics.ListCreateAPIView):
+class ListCreatePostView(generics.ListCreateAPIView):
     queryset = Post.objects.all()
     serializer_class = PostSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -26,7 +27,7 @@ class LikePostView(APIView):
         user = request.user
         msg = ""
 
-        post = Post.objects.get(id=pk)
+        post = get_object_or_404(Post, pk=pk)
 
         if len(post.likes.filter(id=user.id)) < 1:
             post.likes.add(user)
@@ -38,3 +39,17 @@ class LikePostView(APIView):
         post.save()
         
         return Response({ "msg": msg })
+
+class ListCreateCommentView(generics.ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        id = self.kwargs.get('pk')
+        print(Comment.objects.filter(post=id))
+        return Comment.objects.filter(post=id)
+
+    def perform_create(self, serializer):
+        post = get_object_or_404(Post, pk=self.kwargs['pk'])
+        serializer.save(owner=self.request.user, post=post)

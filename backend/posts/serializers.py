@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
-from .models import Post
+from .models import Post, Comment
 
 User = get_user_model()
 
@@ -23,3 +23,17 @@ class PostSerializer(serializers.ModelSerializer):
         
         new_response = { "msg": { "post": response } }
         return new_response
+
+class CommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        exclude = ('post', 'owner', 'created_at', 'likes')
+
+    def to_representation(self, instance):
+        response = super().to_representation(instance)
+        
+        owner = UserSerializer(data=instance.owner.__dict__)
+        owner.is_valid()
+        response["owner"] = owner.data
+        
+        return response
