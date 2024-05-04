@@ -35,6 +35,7 @@ INSTALLED_APPS = [
 
     'authentication',
     'posts',
+    'users',
 ]
 
 REST_FRAMEWORK = {
@@ -83,7 +84,7 @@ SIMPLE_JWT = {
     "SLIDING_TOKEN_REFRESH_SERIALIZER": "rest_framework_simplejwt.serializers.TokenRefreshSlidingSerializer",
 }
 
-AUTH_USER_MODEL = "authentication.User"
+AUTH_USER_MODEL = "users.User"
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',

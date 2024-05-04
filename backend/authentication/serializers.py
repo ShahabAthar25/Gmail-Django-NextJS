@@ -3,11 +3,6 @@ from django.contrib.auth import get_user_model
 
 User = get_user_model()
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 'password', 'profile_pic', 'bio', 'website')
-
 class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -23,7 +18,7 @@ class RegisterSerializer(serializers.ModelSerializer):
         )
 
         return user
-    
+
     def to_representation(self, instance):
         response = super().to_representation(instance)
         if response.get("password", None):
@@ -33,6 +28,3 @@ class RegisterSerializer(serializers.ModelSerializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField()
-
-class WhoAmISerializer(serializers.Serializer):
-    token = serializers.CharField()

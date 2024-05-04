@@ -1,9 +1,9 @@
 from rest_framework.response import Response
-from rest_framework.views import APIView
 from rest_framework import generics, permissions
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate, get_user_model
-from .serializers import RegisterSerializer, LoginSerializer, UserSerializer, WhoAmISerializer
+from .serializers import RegisterSerializer, LoginSerializer
+from users.serializers import UserSerializer
 
 User = get_user_model()
 
@@ -41,7 +41,7 @@ class LoginView(generics.GenericAPIView):
 class WhoAmIView(generics.GenericAPIView):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get(self, request):
         user = User.objects.get(pk=request.user.pk)
         user_data = UserSerializer(data=user.__dict__)
