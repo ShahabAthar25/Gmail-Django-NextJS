@@ -1,6 +1,8 @@
 from rest_framework import permissions, generics
 from rest_framework.response import Response
+from rest_framework.exceptions import ValidationError
 from django.contrib.auth import get_user_model
+
 from .serializers import UserSerializer
 from .permissions import IsOwnerOrReadOnlyPermission
 
@@ -26,3 +28,13 @@ class RetrieveUpdateDestroyUser(generics.RetrieveUpdateDestroyAPIView):
     
     def patch(self, request, *args, **kwargs):
         return self.partial_update(request, *args, **kwargs)
+
+class SearchUsersView(generics.ListAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = UserSerializer
+    
+    def get_queryset(self):
+        search_query = self.request.GET.get('q', None)
+        if not search_query:
+            raise ValidationError(detail="Url parameter 'q' was not provided.")
+        return User.objects.filter(username__contains=search_query)
